@@ -4,7 +4,7 @@ Verification of [talk2docker](https://github.com/ailispaw/talk2docker) and [Ranc
 
 ### Requirements
 
-- [talk2docker](https://github.com/ailispaw/talk2docker) >= v1.1.0
+- [talk2docker](https://github.com/ailispaw/talk2docker) >= v1.3.0
 - [RancherOS ISO Box](https://github.com/ailispaw/rancheros-iso-box) >= v0.3.0
 - [VirtualBox](https://www.virtualbox.org/)
 - [Vagrant](https://www.vagrantup.com/)
