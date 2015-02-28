@@ -1,0 +1,3 @@
+.vagrant/
+.certs/
+talk2docker.yml.bak
