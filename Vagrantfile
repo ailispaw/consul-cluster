@@ -6,7 +6,7 @@ BASE_IP_ADDR  = "192.168.65"
 
 Vagrant.configure(2) do |config|
   config.vm.box = "rancheros"
-  config.vm.box_url = "https://github.com/ailispaw/rancheros-iso-box/releases/download/v0.3.0/rancheros-virtualbox.box"
+  config.vm.box_url = "https://github.com/ailispaw/rancheros-iso-box/releases/download/v0.5.0/rancheros-virtualbox.box"
 
   if Vagrant.has_plugin?("vagrant-triggers") then
     config.trigger.after [:up, :resume] do
