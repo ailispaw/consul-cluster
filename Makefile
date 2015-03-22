@@ -10,15 +10,7 @@ up: $(NODES)
 $(NODES):
 	vagrant up $@
 
-	mkdir -p .certs/$@
-	vagrant ssh $@ -c 'cp /home/rancher/.certs/* /vagrant/.certs/$@/' -- -T
-
-	$(T2D) host add $@ "tcp://$(NODE_IP:node=$@):2376" \
-		--tls \
-		--tls-ca-cert="`pwd`/.certs/$@/ca.pem" \
-		--tls-cert="`pwd`/.certs/$@/client-cert.pem" \
-		--tls-key="`pwd`/.certs/$@/client-key.pem" \
-		|| $(T2D) host switch $@
+	$(T2D) host add $@ "tcp://$(NODE_IP:node=$@):2375" || $(T2D) host switch $@
 
 	$(T2D) compose consul.yml $@ --name=consul --hostname=$@ \
 		--env=JOIN_IP=$(NODE_IP:node=node-01) --env=NODE_IP=$(NODE_IP:node=$@)

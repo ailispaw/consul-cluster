@@ -6,14 +6,16 @@ BASE_IP_ADDR  = "192.168.65"
 
 Vagrant.configure(2) do |config|
   config.vm.box = "rancheros"
-  config.vm.box_url = "https://github.com/ailispaw/rancheros-iso-box/releases/download/v0.5.0/rancheros-virtualbox.box"
+  config.vm.box_url = "https://github.com/ailispaw/rancheros-iso-box/releases/download/v0.6.1/rancheros-virtualbox.box"
+
+  config.vm.network :forwarded_port, guest: 2375, host: 2375, auto_correct: true
 
   if Vagrant.has_plugin?("vagrant-triggers") then
     config.trigger.after [:up, :resume] do
       info "Adjusting datetime after suspend and resume."
       run_remote <<-EOT.prepend("\n")
         sudo system-docker stop ntp
-        sudo ntpd -n -q -g
+        sudo ntpd -n -q -g -I eth0 > /dev/null
         date
         sudo system-docker start ntp
       EOT
@@ -24,7 +26,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision :shell, run: "always" do |sh|
     sh.inline = <<-EOT
       system-docker stop ntp
-      ntpd -n -q -g
+      ntpd -n -q -g -I eth0 > /dev/null
       date
       system-docker start ntp
     EOT
