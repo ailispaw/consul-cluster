@@ -1,14 +1,27 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+module VagrantPlugins
+  module GuestLinux
+    class Plugin < Vagrant.plugin("2")
+      guest_capability("linux", "change_host_name") do
+        Cap::ChangeHostName
+      end
+
+      guest_capability("linux", "configure_networks") do
+        Cap::ConfigureNetworks
+      end
+    end
+  end
+end
+
 NUM_INSTANCES = 3
 BASE_IP_ADDR  = "192.168.65"
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "rancheros"
-  config.vm.box_url = "https://github.com/ailispaw/rancheros-iso-box/releases/download/v0.6.1/rancheros-virtualbox.box"
+  config.vm.box = "ailispaw/rancheros"
 
-  config.vm.network :forwarded_port, guest: 2375, host: 2375, auto_correct: true
+  config.vm.network :forwarded_port, guest: 2375, host: 2375, disabled: true
 
   if Vagrant.has_plugin?("vagrant-triggers") then
     config.trigger.after [:up, :resume] do
