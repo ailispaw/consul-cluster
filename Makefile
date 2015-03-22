@@ -34,7 +34,6 @@ test:
 clean:
 	vagrant destroy -f
 	$(RM) -r .vagrant
-	$(RM) -r .certs
 	$(RM) talk2docker.yml
 
 .PHONY: up $(NODES) status test clean
