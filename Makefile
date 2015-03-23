@@ -95,3 +95,39 @@ wordpress-clean:
 	$(RM) -r wordpress/wordpress
 
 .PHONY: wordpress wordpress-status wordpress-clean
+
+TOKEN := `$(T2D) --host=node-01 container logs token`
+
+swarm:
+	$(T2D) host switch node-01
+	-$(T2D) container remove token manager agent -f
+	$(T2D) compose swarm.yml create --name=token
+	$(T2D) container start token
+	$(T2D) container wait token
+	echo $(TOKEN)
+
+	$(T2D) compose swarm.yml manager --cmd=manage,token://$(TOKEN)
+	$(T2D) container start manager
+	$(T2D) ps -l
+
+	for node in $(NODES); do \
+		$(T2D) host switch $$node; \
+		$(T2D) container remove agent -f; \
+		$(T2D) compose swarm.yml agent --cmd=join,--addr=$(NODE_IP:node=$$node):2375,token://$(TOKEN); \
+		$(T2D) container start agent; \
+		$(T2D) ps -l; \
+	done
+
+swarm-status:
+	docker -H tcp://$(NODE_IP:node=node-01):2380 info
+
+swarm-clean:
+	for node in $(NODES); do \
+		$(T2D) host switch $$node; \
+		$(T2D) container remove agent -f; \
+	done
+
+	$(T2D) host switch node-01
+	-$(T2D) container remove token manager -f
+
+.PHONY: swarm swarm-status swarm-clean
