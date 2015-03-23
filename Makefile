@@ -57,3 +57,41 @@ redis-clean:
 	$(T2D) container rm redis
 
 .PHONY: redis redis-status redis-clean
+
+wordpress:
+	$(T2D) host switch node-02
+	$(T2D) compose wordpress.yml db
+	$(T2D) container start db
+	$(T2D) ps -l
+
+	test -d wordpress/wordpress || (cd wordpress && \
+		curl https://wordpress.org/latest.tar.gz | tar -xzf - && \
+		cp wp-config.php wordpress/ && \
+		cp router.php wordpress/)
+
+	$(T2D) host switch node-03
+	$(T2D) compose wordpress.yml web
+	$(T2D) container start web
+	$(T2D) ps -l
+
+wordpress-status:
+	curl -s $(NODE_IP:node=node-01):8500/v1/catalog/service/mysql?pretty
+
+	nslookup mysql.service.consul $(NODE_IP:node=node-01)
+
+	open http://$(NODE_IP:node=node-01):8500/ui/#/dc1/services/mysql
+
+	open http://$(NODE_IP:node=node-03):8000/
+
+wordpress-clean:
+	$(T2D) host switch node-03
+	-$(T2D) container stop web
+	-$(T2D) container rm web
+
+	$(T2D) host switch node-02
+	$(T2D) container stop db
+	$(T2D) container rm db
+
+	$(RM) -r wordpress/wordpress
+
+.PHONY: wordpress wordpress-status wordpress-clean

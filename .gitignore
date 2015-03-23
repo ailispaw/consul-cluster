@@ -1,3 +1,5 @@
 .vagrant/
 .certs/
 talk2docker.yml*
+
+wordpress/wordpress/
