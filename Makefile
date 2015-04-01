@@ -110,6 +110,8 @@ swarm:
 	$(T2D) container start manager
 	$(T2D) ps -l
 
+	$(T2D) host add $@ "tcp://$(NODE_IP:node=node-01):2380" || $(T2D) host switch $@
+
 	for node in $(NODES); do \
 		$(T2D) host switch $$node; \
 		$(T2D) container remove agent -f; \
@@ -119,6 +121,8 @@ swarm:
 	done
 
 swarm-status:
+	$(T2D) --host=swarm version
+
 	docker -H tcp://$(NODE_IP:node=node-01):2380 info
 
 swarm-clean:
