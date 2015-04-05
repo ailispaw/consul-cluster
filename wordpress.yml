@@ -16,6 +16,7 @@ db:
 
 web:
   <<: *common
+  image: wordpress
   build: wordpress/Dockerfile
   command: ["php", "-S", "0.0.0.0:8000", "-t", "/code"]
   ports:
