@@ -19,30 +19,20 @@ NUM_INSTANCES = 3
 BASE_IP_ADDR  = "192.168.65"
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "ailispaw/rancheros"
+  config.vm.box = "ailispaw/rancheros-lite"
 
-  config.vm.network :forwarded_port, guest: 2375, host: 2375, disabled: true
+  config.vm.network :forwarded_port, guest: 2375, host: 2375, auto_correct: true, disabled: true
 
   if Vagrant.has_plugin?("vagrant-triggers") then
     config.trigger.after [:up, :resume] do
       info "Adjusting datetime after suspend and resume."
-      run_remote <<-EOT.prepend("\n")
-        sudo system-docker stop ntp
-        sudo ntpd -n -q -g -I eth0 > /dev/null
-        date
-        sudo system-docker start ntp
-      EOT
+      run_remote "sudo ntpd -n -q -g -I eth0 > /dev/null; date"
     end
   end
 
   # Adjusting datetime before provisioning.
   config.vm.provision :shell, run: "always" do |sh|
-    sh.inline = <<-EOT
-      system-docker stop ntp
-      ntpd -n -q -g -I eth0 > /dev/null
-      date
-      system-docker start ntp
-    EOT
+    sh.inline = "sudo ntpd -n -q -g -I eth0 > /dev/null; date"
   end
 
   (1..NUM_INSTANCES).each do |i|
@@ -51,7 +41,7 @@ Vagrant.configure(2) do |config|
 
       node.vm.network :private_network, ip: "#{BASE_IP_ADDR}.#{i+100}"
 
-      node.vm.synced_folder ".", "/vagrant", type: "nfs", mount_options: ["nolock", "vers=3", "udp"]
+      node.vm.synced_folder ".", "/vagrant"
     end
   end
 end
