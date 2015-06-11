@@ -1,24 +1,24 @@
 consul: &consul
   image: progrium/consul
   ports:
-    - 8300:8300
-    - 8301:8301/tcp
-    - 8301:8301/udp
-    - 8302:8302/tcp
-    - 8302:8302/udp
-    - 8400:8400
-    - 8500:8500
-    - 53:53/tcp
-    - 53:53/udp
+    - 8300:8300     # Internal Use
+    - 8301:8301/tcp # Internal Use
+    - 8301:8301/udp # Internal Use
+    - 8302:8302/tcp # Internal Use
+    - 8302:8302/udp # Internal Use
+    - 8400:8400     # RPC
+    - 8500:8500     # HTTP API & UI
+    - 53:53/tcp     # DNS
+    - 53:53/udp     # DNS
   entrypoint: /bin/sh
 
-master: &master
+bootstrap: &bootstrap
   <<: *consul
   command:
     - -c
     - /bin/start -server -bootstrap -advertise=${NODE_IP} -join=${JOIN_IP}
 
-slave: &slave
+server: &server
   <<: *consul
   command:
     - -c
@@ -31,10 +31,10 @@ client: &client
     - /bin/start -advertise=${NODE_IP} -join=${JOIN_IP}
 
 node-01:
-  <<: *master
+  <<: *bootstrap
 
 node-02:
-  <<: *slave
+  <<: *server
 
 node-03:
   <<: *client
