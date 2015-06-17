@@ -1,15 +1,15 @@
 consul: &consul
   image: progrium/consul
   ports:
-    - 8300:8300     # Internal Use
-    - 8301:8301/tcp # Internal Use
-    - 8301:8301/udp # Internal Use
-    - 8302:8302/tcp # Internal Use
-    - 8302:8302/udp # Internal Use
-    - 8400:8400     # RPC
-    - 8500:8500     # HTTP API & UI
-    - 53:53/tcp     # DNS
-    - 53:53/udp     # DNS
+    - 8300:8300     # Server RPC, Server Use Only
+    - 8301:8301/tcp # Serf Gossip Protocol for LAN
+    - 8301:8301/udp # Serf Gossip Protocol for LAN
+    - 8302:8302/tcp # Serf Gossip Protocol for WAN, Server Use Only
+    - 8302:8302/udp # Serf Gossip Protocol for WAN, Server Use Only
+    - 8400:8400     # CLI RPC
+    - 8500:8500     # HTTP API & Web UI
+    - 53:53/tcp     # DNS Interface
+    - 53:53/udp     # DNS Interface
   entrypoint: /bin/sh
 
 bootstrap: &bootstrap
