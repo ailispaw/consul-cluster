@@ -18,6 +18,11 @@ web:
   <<: *common
   image: wordpress
   build: wordpress/Dockerfile
-  command: ["php", "-S", "0.0.0.0:8000", "-t", "/code"]
+  environment:
+    - DB_NAME=wordpress
+    - DB_USER=root
+    - DB_PASSWORD=
+    - DB_HOST=mysql:3306
+  command: ["php", "-d", "variables_order=EGPCS", "-S", "0.0.0.0:8000", "-t", "/code"]
   ports:
     - "8000:8000"
