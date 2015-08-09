@@ -3,7 +3,7 @@ T2D := talk2docker --config=talk2docker.yml
 NODES := node-01 node-02 node-03
 
 GET_IP  := ifconfig eth1 | awk '/inet addr/{print substr(\\$$2,6)}'
-NODE_IP := `vagrant ssh node -c "$(GET_IP)" -- -T | tail -1`
+NODE_IP := `vagrant ssh node -c "$(GET_IP)" -- -T`
 
 up: $(NODES)
 
