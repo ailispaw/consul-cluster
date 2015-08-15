@@ -40,7 +40,7 @@ node-03:
   <<: *client
 
 registrator:
-  image: gliderlabs/registrator
+  image: gliderlabs/registrator:v5
   volumes:
     - /var/run/docker.sock:/tmp/docker.sock
   links:
