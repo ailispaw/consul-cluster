@@ -1,13 +1,4 @@
-common: &common
-  dns:
-    - 172.17.42.1
-    - 8.8.8.8
-    - 8.8.4.4
-  dns_search:
-    - service.consul
-
 db:
-  <<: *common
   image: orchardup/mysql
   environment:
     - MYSQL_DATABASE=wordpress
@@ -15,7 +6,6 @@ db:
     - "3306:3306"
 
 web:
-  <<: *common
   image: wordpress
   build: wordpress/Dockerfile
   environment:

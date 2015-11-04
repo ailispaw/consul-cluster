@@ -45,3 +45,40 @@ clean:
 	$(RM) talk2docker.yml
 
 .PHONY: up $(NODES) status test clean
+
+wordpress:
+	-$(T2D) -H node-02 docker -- network create -d overlay wordpress
+
+	$(T2D) host switch node-02
+	$(T2D) compose wordpress.yml db --net=wordpress
+	$(T2D) container start db
+	$(T2D) ps -l
+
+	test -d wordpress/wordpress || (cd wordpress && \
+		curl https://wordpress.org/latest.tar.gz | tar -xzf - && \
+		cp wp-config.php wordpress/ && \
+		cp router.php wordpress/)
+
+	$(T2D) host switch node-03
+	$(T2D) compose wordpress.yml web --net=wordpress \
+		--env=DB_NAME=wordpress,DB_USER=root,DB_PASSWORD=,DB_HOST=db.wordpress:3306
+	$(T2D) container start web
+	$(T2D) ps -l
+
+wordpress-test:
+	open http://$(NODE_IP:node=node-03):8000/
+
+wordpress-clean:
+	$(T2D) host switch node-03
+	-$(T2D) container stop web
+	-$(T2D) container rm web
+
+	$(T2D) host switch node-02
+	$(T2D) container stop db
+	$(T2D) container rm db
+
+	$(T2D) docker network rm wordpress
+
+	$(RM) -r wordpress/wordpress
+
+.PHONY: wordpress wordpress-test wordpress-clean
