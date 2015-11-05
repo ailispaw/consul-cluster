@@ -29,15 +29,19 @@ node-02 node-03:
 
 status:
 	for node in $(NODES); do \
-		$(T2D) --host=$$node ps ; \
+		$(T2D) host switch $$node; \
+		$(T2D) ps; \
+		$(T2D) docker network ls; \
 	done
 
 test:
-	-$(T2D) -H node-02 docker -- network create -d overlay myapp
+	$(T2D) host switch node-02
 
-	-$(T2D) -H node-02 docker -- run -itd --name=web --net=myapp nginx
+	-$(T2D) docker -- network create -d overlay myapp
 
-	$(T2D) -H node-03 docker -- run -it --rm --net=myapp busybox wget -qO- http://web.myapp
+	-$(T2D) docker -- run -itd --name=web --net=myapp nginx
+
+	$(T2D) --host=node-03 docker -- run -it --rm --net=myapp busybox wget -qO- http://web.myapp
 
 clean:
 	vagrant destroy -f
@@ -47,9 +51,8 @@ clean:
 .PHONY: up $(NODES) status test clean
 
 wordpress:
-	-$(T2D) -H node-02 docker -- network create -d overlay wordpress
-
 	$(T2D) host switch node-02
+	$(T2D) docker -- network create -d overlay wordpress
 	$(T2D) compose wordpress.yml db --net=wordpress
 	$(T2D) container start db
 	$(T2D) ps -l
