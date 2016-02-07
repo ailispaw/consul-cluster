@@ -1,6 +1,6 @@
 # Docker Cluster with Consul
 
-Verification of [talk2docker](https://github.com/ailispaw/talk2docker) and [DockerRoot Vagrant Box](https://github.com/ailispaw/docker-root-packer) with [docker-consul](https://github.com/progrium/docker-consul).
+Verification of [talk2docker](https://github.com/ailispaw/talk2docker) and [DockerRoot Vagrant Box](https://github.com/ailispaw/docker-root-packer) with [docker-consul](https://github.com/gliderlabs/docker-consul).
 
 ### Requirements
 
