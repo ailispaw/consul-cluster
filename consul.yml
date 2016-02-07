@@ -1,5 +1,5 @@
 consul: &consul
-  image: progrium/consul
+  image: gliderlabs/consul
   ports:
     - 8300:8300     # Server RPC, Server Use Only
     - 8301:8301/tcp # Serf Gossip Protocol for LAN
@@ -8,27 +8,27 @@ consul: &consul
     - 8302:8302/udp # Serf Gossip Protocol for WAN, Server Use Only
     - 8400:8400     # CLI RPC
     - 8500:8500     # HTTP API & Web UI
-    - 53:53/tcp     # DNS Interface
-    - 53:53/udp     # DNS Interface
+    - 8600:8600/tcp # DNS Interface
+    - 8600:8600/udp # DNS Interface
   entrypoint: /bin/sh
 
 bootstrap: &bootstrap
   <<: *consul
   command:
     - -c
-    - /bin/start -server -bootstrap -advertise=${NODE_IP} -join=${JOIN_IP}
+    - /bin/consul agent -server -bootstrap -advertise=${NODE_IP} -data-dir=/tmp/consul -client=0.0.0.0 -ui -log-level=debug
 
 server: &server
   <<: *consul
   command:
     - -c
-    - /bin/start -server -advertise=${NODE_IP} -join=${JOIN_IP}
+    - /bin/consul agent -server -advertise=${NODE_IP} -join=${JOIN_IP} -data-dir=/tmp/consul
 
 client: &client
   <<: *consul
   command:
     - -c
-    - /bin/start -advertise=${NODE_IP} -join=${JOIN_IP}
+    - /bin/consul agent -advertise=${NODE_IP} -join=${JOIN_IP} -data-dir=/tmp/consul
 
 node-01:
   <<: *bootstrap
