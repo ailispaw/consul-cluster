@@ -17,25 +17,11 @@ $ make status
 $ make test
 ```
 
-### Add a redis service
-
-```
-$ make redis
-$ make redis-status
-```
-
 ### Add a wordpress service
 
 ```
 $ make wordpress
-$ make wordpress-status
-```
-
-### Add a swarm service
-
-```
-$ make swarm
-$ make swarm-status
+$ make wordpress-test
 ```
 
 ### References
