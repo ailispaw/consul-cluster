@@ -42,9 +42,8 @@ node-02 node-03:
 
 status:
 	for node in $(NODES); do \
-		$(T2D) host switch $$node; \
-		$(T2D) ps; \
-		$(T2D) docker network ls; \
+		$(T2D) --host=$$node ps; \
+		$(T2D) --host=$$node docker network ls; \
 	done
 
 test:
