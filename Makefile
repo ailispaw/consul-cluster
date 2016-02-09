@@ -100,8 +100,8 @@ wordpress-clean:
 	-$(T2D) container rm web
 
 	$(T2D) host switch node-02
-	$(T2D) container stop db
-	$(T2D) container rm db
+	-$(T2D) container stop db
+	-$(T2D) container rm db
 
 	$(T2D) docker network rm wordpress
 
