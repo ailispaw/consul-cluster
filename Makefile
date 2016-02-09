@@ -17,6 +17,10 @@ node-01:
 	$(T2D) container start consul
 	$(T2D) ps -l
 
+	$(T2D) compose consul.yml registrator --hostname=$@
+	$(T2D) container start registrator
+	$(T2D) ps -l
+
 node-02 node-03:
 	vagrant up $@
 
@@ -24,8 +28,17 @@ node-02 node-03:
 
 	$(eval CONSUL_IP=$$(shell echo $$(NODE_IP:node=node-01)))
 
-	vagrant ssh $@ -c 'echo "DOCKER_EXTRA_ARGS=\"--userland-proxy=false --cluster-store=consul://$(CONSUL_IP):8500 --cluster-advertise=eth1:0\"" | sudo tee -a /var/lib/docker-root/profile'
+	vagrant ssh $@ -c 'echo "DOCKER_EXTRA_ARGS=\"--userland-proxy=false --cluster-store=consul://$(CONSUL_IP):8500 --cluster-advertise=eth1:0\"" | sudo tee -a /var/lib/docker-root/profile' -- -T
 	vagrant ssh $@ -c 'sudo /etc/init.d/docker restart' -- -T
+
+	$(T2D) compose consul.yml $@ --name=consul --hostname=$@ \
+		--env=JOIN_IP=$(NODE_IP:node=node-01) --env=NODE_IP=$(NODE_IP:node=$@)
+	$(T2D) container start consul
+	$(T2D) ps -l
+
+	$(T2D) compose consul.yml registrator --hostname=$@
+	$(T2D) container start registrator
+	$(T2D) ps -l
 
 status:
 	for node in $(NODES); do \
@@ -35,6 +48,11 @@ status:
 	done
 
 test:
+	vagrant ssh node-01 -c "docker exec -t consul consul members" -- -T
+
+	open http://$(NODE_IP:node=node-01):8500/ui/
+
+network-test:
 	$(T2D) host switch node-02
 
 	-$(T2D) docker -- network create -d overlay myapp
@@ -48,7 +66,7 @@ clean:
 	$(RM) -r .vagrant
 	$(RM) talk2docker.yml
 
-.PHONY: up $(NODES) status test clean
+.PHONY: up $(NODES) status test network-test clean
 
 wordpress:
 	$(T2D) host switch node-02
@@ -68,7 +86,13 @@ wordpress:
 	$(T2D) container start web
 	$(T2D) ps -l
 
-wordpress-test:
+wordpress-status:
+	curl -s $(NODE_IP:node=node-01):8500/v1/catalog/service/mysql?pretty
+
+	nslookup -port=8600 mysql.service.consul $(NODE_IP:node=node-01)
+
+	open http://$(NODE_IP:node=node-01):8500/ui/#/dc1/services/mysql
+
 	open http://$(NODE_IP:node=node-03):8000/
 
 wordpress-clean:
@@ -84,4 +108,4 @@ wordpress-clean:
 
 	$(RM) -r wordpress/wordpress
 
-.PHONY: wordpress wordpress-test wordpress-clean
+.PHONY: wordpress wordpress-status wordpress-clean

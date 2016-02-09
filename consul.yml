@@ -16,7 +16,34 @@ bootstrap: &bootstrap
   <<: *consul
   command:
     - -c
-    - /bin/consul agent -server -bootstrap -advertise=${NODE_IP} -data-dir=/tmp/consul -client=0.0.0.0 -ui -log-level=debug
+    - /bin/consul agent -server -bootstrap -advertise=${NODE_IP} -retry-join=${JOIN_IP} -data-dir=/tmp/consul -client=0.0.0.0 -ui -log-level=debug
+
+server: &server
+  <<: *consul
+  command:
+    - -c
+    - /bin/consul agent -server -advertise=${NODE_IP} -join=${JOIN_IP} -data-dir=/tmp/consul -client=0.0.0.0
+
+client: &client
+  <<: *consul
+  command:
+    - -c
+    - /bin/consul agent -advertise=${NODE_IP} -join=${JOIN_IP} -data-dir=/tmp/consul -client=0.0.0.0
 
 node-01:
   <<: *bootstrap
+
+node-02:
+  <<: *server
+
+node-03:
+  <<: *client
+
+registrator:
+  image: gliderlabs/registrator
+  volumes:
+    - /var/run/docker.sock:/tmp/docker.sock
+  links:
+    - consul
+  command:
+    - consul://consul:8500
