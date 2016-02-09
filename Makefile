@@ -88,7 +88,7 @@ wordpress:
 wordpress-status:
 	curl -s $(NODE_IP:node=node-01):8500/v1/catalog/service/mysql?pretty
 
-	nslookup -port=8600 mysql.service.consul $(NODE_IP:node=node-01)
+	nslookup mysql.service.consul $(NODE_IP:node=node-01)
 
 	open http://$(NODE_IP:node=node-01):8500/ui/#/dc1/services/mysql
 

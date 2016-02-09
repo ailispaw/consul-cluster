@@ -8,8 +8,8 @@ consul: &consul
     - 8302:8302/udp # Serf Gossip Protocol for WAN, Server Use Only
     - 8400:8400     # CLI RPC
     - 8500:8500     # HTTP API & Web UI
-    - 8600:8600/tcp # DNS Interface
-    - 8600:8600/udp # DNS Interface
+    - 53:8600/tcp   # DNS Interface
+    - 53:8600/udp   # DNS Interface
   entrypoint: /bin/sh
 
 bootstrap: &bootstrap
