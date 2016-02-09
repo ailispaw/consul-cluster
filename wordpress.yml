@@ -13,6 +13,9 @@ web:
     - DB_USER=root
     - DB_PASSWORD=
     - DB_HOST=mysql:3306
+  volumes:
+    - /usr/bin/dumb-init:/dumb-init:ro
+  entrypoint: /dumb-init
   command: ["php", "-d", "variables_order=EGPCS", "-S", "0.0.0.0:8000", "-t", "/code"]
   ports:
     - "8000:8000"
