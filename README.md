@@ -21,7 +21,7 @@ $ make test
 
 ```
 $ make wordpress
-$ make wordpress-test
+$ make wordpress-status
 ```
 
 ### References
