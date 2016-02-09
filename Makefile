@@ -17,7 +17,7 @@ node-01:
 	$(T2D) container start consul
 	$(T2D) ps -l
 
-	$(T2D) compose consul.yml registrator --hostname=$@
+	$(T2D) compose consul.yml registrator --hostname=$@ --cmd=-ip,$(NODE_IP:node=$@),consul://consul:8500
 	$(T2D) container start registrator
 	$(T2D) ps -l
 
@@ -36,7 +36,7 @@ node-02 node-03:
 	$(T2D) container start consul
 	$(T2D) ps -l
 
-	$(T2D) compose consul.yml registrator --hostname=$@
+	$(T2D) compose consul.yml registrator --hostname=$@ --cmd=-ip,$(NODE_IP:node=$@),consul://consul:8500
 	$(T2D) container start registrator
 	$(T2D) ps -l
 
