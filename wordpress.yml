@@ -1,6 +1,7 @@
 db:
-  image: orchardup/mysql
+  image: mysql
   environment:
+    - MYSQL_ALLOW_EMPTY_PASSWORD=yes
     - MYSQL_DATABASE=wordpress
   ports:
     - "3306:3306"
