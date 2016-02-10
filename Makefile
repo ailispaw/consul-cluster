@@ -76,8 +76,7 @@ wordpress:
 
 	test -d wordpress/wordpress || (cd wordpress && \
 		curl https://wordpress.org/latest.tar.gz | tar -xzf - && \
-		cp wp-config.php wordpress/ && \
-		cp router.php wordpress/)
+		cp wp-config.php wordpress/)
 
 	$(T2D) host switch node-03
 	$(T2D) compose wordpress.yml web --net=wordpress \
