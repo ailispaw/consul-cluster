@@ -56,9 +56,9 @@ network-test:
 
 	-$(T2D) docker -- network create -d overlay myapp
 
-	-$(T2D) docker -- run -itd --name=web --net=myapp nginx
+	-$(T2D) docker -- run -itd --name=web --net=myapp joshix/caddy
 
-	$(T2D) --host=node-03 docker -- run -it --rm --net=myapp busybox wget -qO- http://web.myapp
+	$(T2D) --host=node-03 docker -- run -it --rm --net=myapp busybox wget -qO- http://web.myapp:2015
 
 clean:
 	vagrant destroy -f

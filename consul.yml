@@ -16,7 +16,7 @@ bootstrap: &bootstrap
   <<: *consul
   command:
     - -c
-    - /bin/consul agent -server -bootstrap -advertise=${NODE_IP} -retry-join=${JOIN_IP} -data-dir=/tmp/consul -client=0.0.0.0 -ui -log-level=debug
+    - /bin/consul agent -server -bootstrap -advertise=${NODE_IP} -data-dir=/tmp/consul -client=0.0.0.0 -ui -log-level=debug
 
 server: &server
   <<: *consul
