@@ -17,21 +17,9 @@ BASE_IP_ADDR  = "192.168.65"
 Vagrant.configure(2) do |config|
   config.vm.box = "ailispaw/docker-root"
 
-  config.vm.box_version = ">= 1.1.1"
+  config.vm.box_version = ">= 1.3.9"
 
   config.vm.network :forwarded_port, guest: 2375, host: 2375, auto_correct: true, disabled: true
-
-  if Vagrant.has_plugin?("vagrant-triggers") then
-    config.trigger.after [:up, :resume] do
-      info "Adjusting datetime after suspend and resume."
-      run_remote "sudo sntp -4sSc pool.ntp.org; date"
-    end
-  end
-
-  # Adjusting datetime before provisioning.
-  config.vm.provision "timesync", type: "shell", run: "always" do |sh|
-    sh.inline = "sntp -4sSc pool.ntp.org; date"
-  end
 
   (1..NUM_INSTANCES).each do |i|
     config.vm.define vm_name = "node-%02d" % i do |node|
