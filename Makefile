@@ -28,7 +28,7 @@ node-02 node-03:
 
 	$(eval CONSUL_IP=$$(shell echo $$(NODE_IP:node=node-01)))
 
-	vagrant ssh $@ -c 'echo "DOCKER_EXTRA_ARGS=\"--userland-proxy=false --cluster-store=consul://$(CONSUL_IP):8500 --cluster-advertise=eth1:0\"" | sudo tee -a /var/lib/docker-root/profile' -- -T
+	vagrant ssh $@ -c 'echo "DOCKER_EXTRA_ARGS=\"--userland-proxy=false --cluster-store=consul://$(CONSUL_IP):8500 --cluster-advertise=eth1:0\"" | sudo tee -a /etc/default/docker' -- -T
 	vagrant ssh $@ -c 'sudo /etc/init.d/docker restart' -- -T
 
 	$(T2D) compose consul.yml $@ --name=consul --hostname=$@ \
