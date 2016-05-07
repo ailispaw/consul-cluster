@@ -1,5 +1,5 @@
 consul: &consul
-  image: gliderlabs/consul
+  image: consul
   ports:
     - 8300:8300     # Server RPC, Server Use Only
     - 8301:8301/tcp # Serf Gossip Protocol for LAN
@@ -16,19 +16,19 @@ bootstrap: &bootstrap
   <<: *consul
   command:
     - -c
-    - /bin/consul agent -server -bootstrap -advertise=${NODE_IP} -data-dir=/tmp/consul -client=0.0.0.0 -ui -log-level=debug
+    - docker-entrypoint.sh agent -server -bootstrap -advertise=${NODE_IP} -client=0.0.0.0 -ui -log-level=debug
 
 server: &server
   <<: *consul
   command:
     - -c
-    - /bin/consul agent -server -advertise=${NODE_IP} -join=${JOIN_IP} -data-dir=/tmp/consul -client=0.0.0.0
+    - docker-entrypoint.sh agent -server -advertise=${NODE_IP} -join=${JOIN_IP} -client=0.0.0.0
 
 client: &client
   <<: *consul
   command:
     - -c
-    - /bin/consul agent -advertise=${NODE_IP} -join=${JOIN_IP} -data-dir=/tmp/consul -client=0.0.0.0
+    - docker-entrypoint.sh agent -advertise=${NODE_IP} -join=${JOIN_IP} -client=0.0.0.0
 
 node-01:
   <<: *bootstrap
