@@ -10,23 +10,26 @@ consul: &consul
     - 8500:8500     # HTTP API & Web UI
     - 53:8600/tcp   # DNS Interface
     - 53:8600/udp   # DNS Interface
-  entrypoint: /bin/sh
+  entrypoint: /bin/dumb-init
 
 bootstrap: &bootstrap
   <<: *consul
   command:
+    - /bin/sh
     - -c
     - docker-entrypoint.sh agent -server -bootstrap -advertise=${NODE_IP} -client=0.0.0.0 -ui -log-level=debug
 
 server: &server
   <<: *consul
   command:
+    - /bin/sh
     - -c
     - docker-entrypoint.sh agent -server -advertise=${NODE_IP} -join=${JOIN_IP} -client=0.0.0.0
 
 client: &client
   <<: *consul
   command:
+    - /bin/sh
     - -c
     - docker-entrypoint.sh agent -advertise=${NODE_IP} -join=${JOIN_IP} -client=0.0.0.0
 
