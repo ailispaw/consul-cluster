@@ -1,5 +1,6 @@
 .vagrant/
 .certs/
 talk2docker.yml*
+.ssh_config
 
 wordpress/wordpress/

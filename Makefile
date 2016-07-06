@@ -2,13 +2,16 @@ T2D := talk2docker --config=talk2docker.yml
 
 NODES := node-01 node-02 node-03
 
+SSH_CONFIG := .ssh_config
+
 GET_IP  := ifconfig eth1 | awk '/inet addr/{print substr(\\$$2,6)}'
-NODE_IP := `vagrant ssh node -c "$(GET_IP)" -- -T`
+NODE_IP := `ssh -F $(SSH_CONFIG) node "$(GET_IP)"`
 
 up: $(NODES)
 
 node-01:
 	vagrant up $@
+	vagrant ssh-config $@ > $(SSH_CONFIG)
 
 	$(T2D) host add $@ "tcp://$(NODE_IP:node=$@):2375" || $(T2D) host switch $@
 
@@ -23,13 +26,14 @@ node-01:
 
 node-02 node-03:
 	vagrant up $@
+	vagrant ssh-config $@ >> $(SSH_CONFIG)
 
 	$(T2D) host add $@ "tcp://$(NODE_IP:node=$@):2375" || $(T2D) host switch $@
 
 	$(eval CONSUL_IP=$$(shell echo $$(NODE_IP:node=node-01)))
 
-	vagrant ssh $@ -c 'echo "DOCKER_EXTRA_ARGS=\"--userland-proxy=false --cluster-store=consul://$(CONSUL_IP):8500 --cluster-advertise=eth1:0\"" | sudo tee -a /etc/default/docker' -- -T
-	vagrant ssh $@ -c 'sudo /etc/init.d/docker restart' -- -T
+	ssh -F $(SSH_CONFIG) $@ 'echo "DOCKER_EXTRA_ARGS=\"--userland-proxy=false --cluster-store=consul://$(CONSUL_IP):8500 --cluster-advertise=eth1:0\"" | sudo tee -a /etc/default/docker'
+	ssh -F $(SSH_CONFIG) $@ "sudo /etc/init.d/docker restart"
 
 	$(T2D) compose consul.yml $@ --name=consul --hostname=$@ \
 		--env=JOIN_IP=$(NODE_IP:node=node-01) --env=NODE_IP=$(NODE_IP:node=$@)
@@ -47,7 +51,7 @@ status:
 	done
 
 test:
-	vagrant ssh node-01 -c "docker exec -t consul consul members" -- -T
+	ssh -F $(SSH_CONFIG) node-01 "docker exec -t consul consul members"
 
 	open http://$(NODE_IP:node=node-01):8500/ui/
 
@@ -62,7 +66,7 @@ network-test:
 
 clean:
 	vagrant destroy -f
-	$(RM) -r .vagrant
+	$(RM) -r .vagrant .ssh_config
 	$(RM) talk2docker.yml
 
 .PHONY: up $(NODES) status test network-test clean
